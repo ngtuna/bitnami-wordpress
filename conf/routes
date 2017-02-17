@@ -1,0 +1,24 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+module:testrunner
+
+GET     /                                       App.Input
+POST    /describe-ec2                           App.DescribeEC2State
+POST    /run-ec2                                App.RunEC2
+POST    /stop-ec2                               App.StopEC2
+POST    /terminate-ec2                          App.TerminateEC2
+POST    /publicip-ec2                           App.GetIPAddress
+
+GET 	/ec2 									App.EC2
+
+
+# Ignore favicon requests
+GET     /favicon.ico                            404
+
+# Map static resources from the /app/public folder to the /public path
+GET     /public/*filepath                       Static.Serve("public")
+
+# Catch all
+*       /:controller/:action                    :controller.:action

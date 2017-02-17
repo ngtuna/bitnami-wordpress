@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EC2</title>
+    <script src="/public/js/jquery-1.9.1.min.js" type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" href="/public/css/font-awesome.min.css">
+</head>
+<body>
+
+<div>
+<p id="des"></p>
+<p id="id"></p>
+<p id="ipaddress"></p>
+<div id="btnaction" style="display: none;">
+	<button id ="btnStop" onclick="userStopEC2()">Stop EC2</button>
+	<button>Terminate EC2</button>
+</div>
+</div>
+<script>
+	var checkInterval;
+	 $(function(){
+	 	checkingEC2();
+	 	getIPAddress();
+      	checkInterval = intervalChecking();
+    });
+
+	function intervalChecking() {
+      return window.setInterval(function() {
+        checkingEC2();
+      },3000);
+    };
+
+    function userStopEC2 () {
+    	stopEC2();
+    	
+      	checkInterval = intervalChecking();
+    }
+
+    function checkingEC2() {
+        $.ajax({
+        type: "POST",
+        url: "/describe-ec2",
+        success: function(data) {
+          $("#id").html(data.instanceId);
+          var icon = '';
+          var des = '';
+          if (data.code == 0 || data.code == 32 || data.code == 64) {
+          	icon = '<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>';
+          } else {
+          	icon = '<i class="fa fa-check" aria-hidden="true"></i>';
+          }
+          des = icon + ' ' + data.state;
+          $("#des").html(des);
+
+          if (data.code == 16 || data.code == 48 || data.code == 80) {
+          	window.clearInterval(checkInterval);
+          	$("#btnaction").removeAttr("style");
+          } 
+        },
+        error: function(jqXHR, status, errorThrown) {
+          if (jqXHR.status == 500) {
+            console.log('Internal error: ' + jqXHR.responseText);
+          } else {
+            console.log('Unexpected error.');
+          }
+        },
+        });
+    }
+
+    function stopEC2() {
+    	$.ajax({
+        type: "POST",
+        url: "/stop-ec2",
+        success: function(data) {
+          checkingEC2();
+          $("#btnStop").attr("disabled","disabled");
+          $("#id").html(data.instanceId);
+          $("#des").html(data.state);
+          if (data.code == 80) {
+          	window.clearInterval(checkInterval);
+          	$("#des").html('<i class="fa fa-check" aria-hidden="true"></i>');
+          }
+        },
+        error: function(jqXHR, status, errorThrown) {
+          if (jqXHR.status == 500) {
+            console.log('Internal error: ' + jqXHR.responseText);
+          } else {
+            console.log('Unexpected error.');
+          }
+        },
+        });
+    }
+
+    function terminateEC2() {
+    	$.ajax({
+        type: "POST",
+        url: "/terminate-ec2",
+        success: function(data) {
+          console.log(data);
+          $("#id").html(data.instanceId);
+          $("#state").html(data.state);
+          if (data.code == 16) {
+          	window.clearInterval(checkInterval);
+          	$("#des").html('<i class="fa fa-check" aria-hidden="true"></i>');
+          	$("#btnaction").removeAttr("style");
+          } 
+        },
+        error: function(jqXHR, status, errorThrown) {
+          if (jqXHR.status == 500) {
+            console.log('Internal error: ' + jqXHR.responseText);
+          } else {
+            console.log('Unexpected error.');
+          }
+        },
+        });
+    }
+
+    function getIPAddress() {
+    	$.ajax({
+        type: "POST",
+        url: "/publicip-ec2",
+        success: function(data) {
+          var ipadd = "http://" + data;
+          var ipDisplay = "Public IP: <a href='"+ipadd+"' target='_blank'>"+data+"</a>";
+          $("#ipaddress").html(ipDisplay);
+        },
+        error: function(jqXHR, status, errorThrown) {
+          if (jqXHR.status == 500) {
+            console.log('Internal error: ' + jqXHR.responseText);
+          } else {
+            console.log('Unexpected error.');
+          }
+        },
+        });
+    }
+</script>
+
+</body>
+</html>

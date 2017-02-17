@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form class="form-horizontal" action="{{url "App.RunEC2"}}" method="POST">
+
+    <div class="form-group">
+        <span class="col-md-3">Access Key</span>
+        <div class="col-md-9">
+            <input type="text" value="" name="accessKey">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <span class="col-md-3">Secret Key</span>
+        <div class="col-md-9">
+            <input type="password" value="" name="secretKey">
+        </div>
+    </div>
+    <div class="cb5"></div>
+
+    <div class="form-group">
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-success">Submit</button>
+            <span style="display:inline-block;width:5px"></span>
+        </div>
+    </div>
+    </form>
+
+</body>
+</html>
