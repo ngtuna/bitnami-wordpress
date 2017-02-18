@@ -14,14 +14,13 @@
 <p id="ipaddress"></p>
 <div id="btnaction" style="display: none;">
 	<button id ="btnStop" onclick="userStopEC2()">Stop EC2</button>
-	<button>Terminate EC2</button>
+	<button id ="btnTerminate" onclick="userTerminateEC2()">Terminate EC2</button>
 </div>
 </div>
 <script>
 	var checkInterval;
 	 $(function(){
 	 	checkingEC2();
-	 	getIPAddress();
       	checkInterval = intervalChecking();
     });
 
@@ -33,16 +32,21 @@
 
     function userStopEC2 () {
     	stopEC2();
-    	
       	checkInterval = intervalChecking();
-    }
+    };
+
+    function userTerminateEC2() {
+    	terminateEC2();
+    	checkInterval = intervalChecking();
+    };
 
     function checkingEC2() {
         $.ajax({
         type: "POST",
         url: "/describe-ec2",
         success: function(data) {
-          $("#id").html(data.instanceId);
+          var insDisplay = "Instance ID: " + data.instanceId;
+          $("#id").html(insDisplay);
           var icon = '';
           var des = '';
           if (data.code == 0 || data.code == 32 || data.code == 64) {
@@ -50,13 +54,32 @@
           } else {
           	icon = '<i class="fa fa-check" aria-hidden="true"></i>';
           }
-          des = icon + ' ' + data.state;
+          des = icon + ' ' + "Server is " + data.state;
           $("#des").html(des);
 
           if (data.code == 16 || data.code == 48 || data.code == 80) {
           	window.clearInterval(checkInterval);
+          	$("#btnStop").attr("disabled","disabled");
+          	$("#btnTerminate").attr("disabled","disabled");
+          	if (data.code == 16) {
+          		$("#btnStop").removeAttr("disabled");
+          		$("#btnTerminate").removeAttr("disabled");
+          	};
+          	if (data.code == 80) {
+          		$("#btnTerminate").removeAttr("disabled");
+          	};
           	$("#btnaction").removeAttr("style");
-          } 
+          } else {
+          	if (data.code == 64 || data.code == 32) {
+          		$("#btnStop").attr("disabled","disabled");
+          		$("#btnTerminate").attr("disabled","disabled");
+          	}
+          }
+
+          if (data.code == 0 || data.code == 16) {
+          	getIPAddress();
+          }
+
         },
         error: function(jqXHR, status, errorThrown) {
           if (jqXHR.status == 500) {
@@ -97,14 +120,13 @@
         type: "POST",
         url: "/terminate-ec2",
         success: function(data) {
-          console.log(data);
           $("#id").html(data.instanceId);
           $("#state").html(data.state);
-          if (data.code == 16) {
+          if (data.code == 48) {
           	window.clearInterval(checkInterval);
           	$("#des").html('<i class="fa fa-check" aria-hidden="true"></i>');
           	$("#btnaction").removeAttr("style");
-          } 
+          }
         },
         error: function(jqXHR, status, errorThrown) {
           if (jqXHR.status == 500) {
@@ -122,7 +144,7 @@
         url: "/publicip-ec2",
         success: function(data) {
           var ipadd = "http://" + data;
-          var ipDisplay = "Public IP: <a href='"+ipadd+"' target='_blank'>"+data+"</a>";
+          var ipDisplay = "Access Link: <a href='"+ipadd+"' target='_blank'>"+ipadd+"</a>";
           $("#ipaddress").html(ipDisplay);
         },
         error: function(jqXHR, status, errorThrown) {

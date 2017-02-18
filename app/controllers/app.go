@@ -1,10 +1,7 @@
 package controllers
 
 import (
-	//"encoding/json"
 	"fmt"
-	//"io/ioutil"
-	//"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -15,16 +12,6 @@ import (
 
 type App struct {
 	*revel.Controller
-}
-
-type Credential struct {
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
-}
-
-type Input struct {
-	Credential Credential `json:"credential"`
-	InstanceID string     `json:"instanceid"`
 }
 
 //Define state struct for instance
@@ -39,10 +26,6 @@ func (c App) Index() revel.Result {
 }
 
 func (c App) DescribeEC2State() revel.Result {
-
-	//var input Input
-	//content, _ := ioutil.ReadAll(c.Request.Body)
-	//err := json.Unmarshal([]byte(content), &input)
 
 	cred := credentials.NewStaticCredentials(c.Session["AccessKey"], c.Session["SecretKey"], "")
 
@@ -89,11 +72,7 @@ func (c App) DescribeEC2State() revel.Result {
 	return c.RenderJson(instanceState)
 }
 
-func (c App) GetIPAddress(data []byte) revel.Result {
-
-	/*var input Input
-	content, _ := ioutil.ReadAll(c.Request.Body)
-	err := json.Unmarshal([]byte(content), &input)*/
+func (c App) GetIPAddress() revel.Result {
 
 	cred := credentials.NewStaticCredentials(c.Session["AccessKey"], c.Session["SecretKey"], "")
 
@@ -136,39 +115,15 @@ func (c App) Input() revel.Result {
 }
 
 func (c App) EC2() revel.Result {
-
-	if accesKey, ok := c.Session["AccessKey"]; ok {
-		fmt.Println("A---------->", accesKey)
-	}
-
-	if secretKey, ok := c.Session["SecretKey"]; ok {
-		fmt.Println("S---------->", secretKey)
-	}
-
-	if iid, ok := c.Session["InstanceID"]; ok {
-		fmt.Println("S---------->", iid)
-	}
-
 	return c.Render()
 }
 
 func (c App) RunEC2(accessKey, secretKey string) revel.Result {
 
-	fmt.Println("acckey", accessKey)
-	fmt.Println("secret", secretKey)
 	//Set data into cookie
 	c.Session["AccessKey"] = accessKey
 	c.Session["SecretKey"] = secretKey
 
-	///var userCre Credential
-	//var input Input
-	//content, _ := ioutil.ReadAll(c.Request.Body)
-	//content, _ := ioutil.ReadAll(c.Request.Body)
-	//err := json.Unmarshal([]byte(content), &input)
-
-	//cred := credentials.NewStaticCredentials(input.Credential.AccessKey, input.Credential.SecretKey, "")
-	//credential := Credential{AccessKey: accessKey, SecretKey: secretKey}
-	//input.Credential = credential
 	cred := credentials.NewStaticCredentials(accessKey, secretKey, "")
 
 	sess, err := session.NewSession()
@@ -238,11 +193,7 @@ func (c App) launchInstance(svc *ec2.EC2) (string, error) {
 	return *resp.Instances[0].InstanceId, nil
 }
 
-func (c App) StopEC2(data []byte) revel.Result {
-
-	/*var input Input
-	content, _ := ioutil.ReadAll(c.Request.Body)
-	err := json.Unmarshal([]byte(content), &input)*/
+func (c App) StopEC2() revel.Result {
 
 	cred := credentials.NewStaticCredentials(c.Session["AccessKey"], c.Session["SecretKey"], "")
 
@@ -272,10 +223,7 @@ func (c App) StopEC2(data []byte) revel.Result {
 	return c.Render(resp.StoppingInstances[0].CurrentState.Code)
 }
 
-func (c App) TerminateEC2(data []byte) revel.Result {
-	/*var input Input
-	content, _ := ioutil.ReadAll(c.Request.Body)
-	err := json.Unmarshal([]byte(content), &input)*/
+func (c App) TerminateEC2() revel.Result {
 
 	cred := credentials.NewStaticCredentials(c.Session["AccessKey"], c.Session["SecretKey"], "")
 
