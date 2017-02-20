@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  bitnami-wordpress:
+    restart: always
+    image: tuna/bitnami-wordpress-aws:0.0.1
+    environment:
+    - IMAGEID=
+    - INSTANCETYPE=
+    - AWSREGION=
+    - KEYNAME=
+    - SECURITYGROUP=
+    - SUBNET=
+    ports:
+      - "9000:9000"
