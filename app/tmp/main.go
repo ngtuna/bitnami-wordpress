@@ -5,9 +5,9 @@ import (
 	"flag"
 	"reflect"
 	"github.com/revel/revel"
-	_ "github.com/ngtuna/bitnami-wordpress-aws/app"
-	controllers "github.com/ngtuna/bitnami-wordpress-aws/app/controllers"
-	tests "github.com/ngtuna/bitnami-wordpress-aws/tests"
+	_ "github.com/ngtuna/bitnami-wordpress/app"
+	controllers "github.com/ngtuna/bitnami-wordpress/app/controllers"
+	tests "github.com/ngtuna/bitnami-wordpress/tests"
 	controllers1 "github.com/revel/modules/static/app/controllers"
 	_ "github.com/revel/modules/testrunner/app"
 	controllers0 "github.com/revel/modules/testrunner/app/controllers"
@@ -36,7 +36,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					40: []string{ 
+					66: []string{ 
 					},
 				},
 			},
@@ -50,7 +50,6 @@ func main() {
 			&revel.MethodType{
 				Name: "GetIPAddress",
 				Args: []*revel.MethodArg{ 
-					&revel.MethodArg{Name: "data", Type: reflect.TypeOf((*[]byte)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
 				},
@@ -60,7 +59,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					152: []string{ 
+					155: []string{ 
 					},
 				},
 			},
@@ -69,7 +68,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					157: []string{ 
+					159: []string{ 
 					},
 				},
 			},
@@ -85,20 +84,18 @@ func main() {
 			&revel.MethodType{
 				Name: "StopEC2",
 				Args: []*revel.MethodArg{ 
-					&revel.MethodArg{Name: "data", Type: reflect.TypeOf((*[]byte)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					273: []string{ 
+					263: []string{ 
 					},
 				},
 			},
 			&revel.MethodType{
 				Name: "TerminateEC2",
 				Args: []*revel.MethodArg{ 
-					&revel.MethodArg{Name: "data", Type: reflect.TypeOf((*[]byte)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					305: []string{ 
+					293: []string{ 
 					},
 				},
 			},
@@ -107,7 +104,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					309: []string{ 
+					297: []string{ 
 					},
 				},
 			},

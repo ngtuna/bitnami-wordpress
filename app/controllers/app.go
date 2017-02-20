@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -21,6 +22,46 @@ type InstanceState struct {
 	State      string `json:"state"`
 }
 
+var imageID, instanceType, region, keyName, securityGroup, subnet string
+
+func init() {
+	imageID = os.Getenv("IMAGEID")
+	if imageID == "" {
+		fmt.Fprintf(os.Stderr, "AMI is required")
+		os.Exit(1)
+	}
+
+	instanceType = os.Getenv("INSTANCETYPE")
+	if instanceType == "" {
+		fmt.Fprintf(os.Stderr, "Instance type is required.")
+		os.Exit(1)
+	}
+
+	region = os.Getenv("AWSREGION")
+	if region == "" {
+		fmt.Fprintf(os.Stderr, "Region is required")
+		os.Exit(1)
+	}
+
+	keyName = os.Getenv("KEYNAME")
+	if keyName == "" {
+		fmt.Fprintf(os.Stderr, "Keyname is required")
+		os.Exit(1)
+	}
+
+	securityGroup = os.Getenv("SECURITYGROUP")
+	if securityGroup == "" {
+		fmt.Fprintf(os.Stderr, "Security group is required")
+		os.Exit(1)
+	}
+
+	subnet = os.Getenv("SUBNET")
+	if subnet == "" {
+		fmt.Fprintf(os.Stderr, "Subnet is required")
+		os.Exit(1)
+	}
+}
+
 func (c App) Index() revel.Result {
 	return c.Render()
 }
@@ -36,7 +77,7 @@ func (c App) DescribeEC2State() revel.Result {
 	}
 
 	svc := ec2.New(sess, &aws.Config{
-		Region:      aws.String("ap-southeast-1"),
+		Region:      aws.String(region),
 		Credentials: cred,
 	})
 
@@ -83,7 +124,7 @@ func (c App) GetIPAddress() revel.Result {
 	}
 
 	svc := ec2.New(sess, &aws.Config{
-		Region:      aws.String("ap-southeast-1"),
+		Region:      aws.String(region),
 		Credentials: cred,
 	})
 
@@ -131,9 +172,8 @@ func (c App) RunEC2(accessKey, secretKey string) revel.Result {
 		fmt.Println("failed to create session, ", err)
 		return c.Redirect(App.Fail)
 	}
-
 	svc := ec2.New(sess, &aws.Config{
-		Region:      aws.String("ap-southeast-1"),
+		Region:      aws.String(region),
 		Credentials: cred,
 	})
 
@@ -148,36 +188,36 @@ func (c App) RunEC2(accessKey, secretKey string) revel.Result {
 
 func (c App) launchInstance(svc *ec2.EC2) (string, error) {
 	params := &ec2.RunInstancesInput{
-		ImageId:  aws.String("ami-71c57212"), // bitnami-wordpress-4.7.2-0-linux-ubuntu-14.04.3-x86_64-hvm
-		MaxCount: aws.Int64(1),               // Required
-		MinCount: aws.Int64(1),               // Required
+		ImageId:  aws.String(imageID), // bitnami-wordpress-4.7.2-0-linux-ubuntu-14.04.3-x86_64-hvm
+		MaxCount: aws.Int64(1),
+		MinCount: aws.Int64(1),
 		BlockDeviceMappings: []*ec2.BlockDeviceMapping{
-			{ // Required
-				DeviceName: aws.String("/dev/sda1"), // default: /dev/sda1
+			{
+				DeviceName: aws.String("/dev/sda1"),
 				Ebs: &ec2.EbsBlockDevice{
 					DeleteOnTermination: aws.Bool(true),
-					VolumeSize:          aws.Int64(10),     // default: 10 GiB
-					VolumeType:          aws.String("gp2"), // default: gp2
+					VolumeSize:          aws.Int64(10),
+					VolumeType:          aws.String("gp2"),
 				},
 			},
 		},
 		DisableApiTermination:             aws.Bool(false),
-		EbsOptimized:                      aws.Bool(false), // default to false
+		EbsOptimized:                      aws.Bool(false),
 		InstanceInitiatedShutdownBehavior: aws.String("stop"),
-		InstanceType:                      aws.String("t2.micro"),       //FIXME: t2.micro
-		KeyName:                           aws.String("tuna-singapore"), //FIXME: select keyname
+		InstanceType:                      aws.String(instanceType),
+		KeyName:                           aws.String(keyName),
 		Monitoring: &ec2.RunInstancesMonitoringEnabled{
-			Enabled: aws.Bool(true), // Required
+			Enabled: aws.Bool(true),
 		},
 		NetworkInterfaces: []*ec2.InstanceNetworkInterfaceSpecification{
-			{ // Required
+			{
 				AssociatePublicIpAddress: aws.Bool(true),
 				DeleteOnTermination:      aws.Bool(true),
 				DeviceIndex:              aws.Int64(0),
 				Groups: []*string{
-					aws.String("sg-1a36d07e"), // FIXME - Security Group: default
+					aws.String(securityGroup),
 				},
-				SubnetId: aws.String("subnet-bebb9cc9"), //FIXME: fixed subnet
+				SubnetId: aws.String(subnet),
 			},
 		},
 		//UserData: aws.String("String"),
@@ -204,7 +244,7 @@ func (c App) StopEC2() revel.Result {
 	}
 
 	svc := ec2.New(sess, &aws.Config{
-		Region:      aws.String("ap-southeast-1"),
+		Region:      aws.String(region),
 		Credentials: cred,
 	})
 
@@ -234,7 +274,7 @@ func (c App) TerminateEC2() revel.Result {
 	}
 
 	svc := ec2.New(sess, &aws.Config{
-		Region:      aws.String("ap-southeast-1"),
+		Region:      aws.String(region),
 		Credentials: cred,
 	})
 

@@ -23,11 +23,9 @@ func (_ tApp) DescribeEC2State(
 }
 
 func (_ tApp) GetIPAddress(
-		data []byte,
 		) string {
 	args := make(map[string]string)
 	
-	revel.Unbind(args, "data", data)
 	return revel.MainRouter.Reverse("App.GetIPAddress", args).Url
 }
 
@@ -57,20 +55,16 @@ func (_ tApp) RunEC2(
 }
 
 func (_ tApp) StopEC2(
-		data []byte,
 		) string {
 	args := make(map[string]string)
 	
-	revel.Unbind(args, "data", data)
 	return revel.MainRouter.Reverse("App.StopEC2", args).Url
 }
 
 func (_ tApp) TerminateEC2(
-		data []byte,
 		) string {
 	args := make(map[string]string)
 	
-	revel.Unbind(args, "data", data)
 	return revel.MainRouter.Reverse("App.TerminateEC2", args).Url
 }
 

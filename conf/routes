@@ -10,9 +10,7 @@ POST    /run-ec2                                App.RunEC2
 POST    /stop-ec2                               App.StopEC2
 POST    /terminate-ec2                          App.TerminateEC2
 POST    /publicip-ec2                           App.GetIPAddress
-
 GET 	/ec2 									App.EC2
-
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
